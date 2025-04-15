@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>PokeTimer</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2rem; }
+    #time, #breakTime { font-size: 2rem; margin: 1rem 0; }
+    button { padding: 1rem 2rem; font-size: 1rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+
+  <h1>PokeTimer</h1>
+  <div id="time">Work: 00:00</div>
+  <button onclick="startBreak()">Start Break</button>
+  <div id="breakTime"></div>
+
+  <script>
+    let startTime = Date.now();
+    let pokeInterval = 20 * 60 * 1000; // 20 min
+    let lastPoke = 0;
+    let breakTimeout = null;
+    let breakTimer = null;
+    let breakStart = null;
+
+    function format(ms) {
+      let totalSeconds = Math.floor(ms / 1000);
+      let mins = String(Math.floor(totalSeconds / 60)).padStart(2, '0');
+      let secs = String(totalSeconds % 60).padStart(2, '0');
+      return `${mins}:${secs}`;
+    }
+
+    function tick() {
+      let elapsed = Date.now() - startTime;
+      document.getElementById("time").textContent = `Work: ${format(elapsed)}`;
+
+      if (elapsed - lastPoke >= pokeInterval) {
+        lastPoke = elapsed;
+        alert("⏰ 20 minutes! Time to check in.");
+        // Optional: play a sound
+        new Audio("https://www.soundjay.com/buttons/sounds/beep-07.mp3").play();
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    function startBreak() {
+      if (breakTimeout) clearTimeout(breakTimeout);
+      if (breakTimer) clearInterval(breakTimer);
+
+      breakStart = Date.now();
+      document.getElementById("breakTime").textContent = `Break: 00:00`;
+
+      breakTimer = setInterval(() => {
+        let breakElapsed = Date.now() - breakStart;
+        document.getElementById("breakTime").textContent = `Break: ${format(breakElapsed)}`;
+      }, 1000);
+
+      breakTimeout = setTimeout(() => {
+        alert("🔔 5-minute break done!");
+        new Audio("https://www.soundjay.com/buttons/sounds/beep-08b.mp3").play();
+        clearInterval(breakTimer);
+        document.getElementById("breakTime").textContent = "";
+      }, 5 * 60 * 1000); // 5 min
+    }
+
+    tick(); // start main loop
+  </script>
+</body>
+</html>
